@@ -211,11 +211,11 @@ export default function SignatureCanvas({ onSignatureComplete, className = "" })
   }, [drawSignature]);
 
   return (
-    <div className={`space-y-4 ${className}`}>
-      <div className="border-2 border-gray-200 rounded-lg sm:rounded-xl overflow-hidden bg-white">
+    <div className={`space-y-3 sm:space-y-4 ${className}`}>
+      <div className="border-2 border-gray-200 rounded-lg overflow-hidden bg-white">
         <canvas
           ref={canvasRef}
-          className="w-full h-48 sm:h-64 cursor-crosshair touch-none"
+          className="w-full h-40 sm:h-48 lg:h-64 cursor-crosshair touch-none"
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -226,28 +226,28 @@ export default function SignatureCanvas({ onSignatureComplete, className = "" })
         />
       </div>
       
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+      <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-3">
         <button
           onClick={clearCanvas}
-          className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors text-sm sm:text-base"
+          className="inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors text-sm flex-1 xs:flex-none"
         >
-          <RotateCcw size={16} />
+          <RotateCcw size={14} />
           Clear
         </button>
         
         <button
           onClick={completeSignature}
           disabled={!hasSignature}
-          className="inline-flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm sm:text-base"
+          className="inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm flex-1 xs:flex-none"
         >
-          <Check size={16} />
+          <Check size={14} />
           Complete Signature
         </button>
       </div>
       
       {hasSignature && (
-        <div className="text-xs sm:text-sm text-green-600 flex items-center gap-2">
-          <Check size={16} />
+        <div className="text-xs sm:text-sm text-green-600 flex items-center gap-2 justify-center xs:justify-start">
+          <Check size={14} />
           Signature ready to use
         </div>
       )}

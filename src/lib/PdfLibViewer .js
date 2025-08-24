@@ -372,10 +372,10 @@ const PdfLibViewer = ({
   }
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`space-y-4 sm:space-y-6 ${className}`}>
       {pages.map((pageData) => (
         <div key={pageData.pageNumber} className="relative">
-          <div className="relative inline-block bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="relative inline-block bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-full">
             <canvas
               ref={(el) => {
                 if (el) {
@@ -389,10 +389,10 @@ const PdfLibViewer = ({
                 }
               }}
               onClick={(e) => handleCanvasClick(e, pageData.pageNumber)}
-              className="block cursor-crosshair max-w-full h-auto"
+              className="block cursor-crosshair w-full h-auto max-w-full"
             />
             
-            <div className="absolute top-3 left-3 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm font-medium">
+            <div className="absolute top-2 left-2 sm:top-3 sm:left-3 bg-black bg-opacity-70 text-white px-2 py-1 sm:px-3 rounded-full text-xs sm:text-sm font-medium">
               Page {pageData.pageNumber}
             </div>
             
@@ -415,7 +415,7 @@ const PdfLibViewer = ({
                   <img
                     src={signature.data}
                     alt="Signature"
-                    className="w-full h-full object-contain opacity-90 drop-shadow-sm"
+                    className="w-full h-full object-contain opacity-90 drop-shadow-sm pointer-events-none"
                     draggable={false}
                   />
                 </div>
@@ -425,15 +425,16 @@ const PdfLibViewer = ({
       ))}
       
       {signatures.length > 0 && (
-        <div className="flex justify-center pt-6">
+        <div className="flex justify-center pt-4 sm:pt-6 px-4">
           <button
             onClick={downloadWithSignatures}
-            className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md text-sm sm:text-base"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            Download Signed PDF
+            <span className="hidden sm:inline">Download Signed PDF</span>
+            <span className="sm:hidden">Download PDF</span>
           </button>
         </div>
       )}

@@ -178,7 +178,7 @@ export default function EnhancedDraggableSignature({
   return (
     <div
       ref={signatureRef}
-      className={`absolute cursor-move select-none ${className}`}
+      className={`absolute cursor-move select-none touch-none ${className}`}
       style={{
         left: position.x,
         top: position.y,
@@ -196,45 +196,45 @@ export default function EnhancedDraggableSignature({
       <img
         src={signatureData}
         alt="Signature"
-        className="w-full h-full object-contain pointer-events-none"
+        className="w-full h-full object-contain pointer-events-none select-none"
         draggable={false}
       />
       
       {/* Drag Handle */}
-      <div className="absolute inset-0 bg-transparent hover:bg-blue-50 hover:bg-opacity-20 transition-colors duration-200 rounded">
-        <div className="absolute top-2 left-2 opacity-0 hover:opacity-100 transition-opacity duration-200">
-          <Move size={16} className="text-blue-600" />
+      <div className="absolute inset-0 bg-transparent hover:bg-blue-50 hover:bg-opacity-20 transition-colors duration-200 rounded touch-manipulation">
+        <div className="absolute top-1 left-1 sm:top-2 sm:left-2 opacity-0 hover:opacity-100 transition-opacity duration-200">
+          <Move size={14} className="text-blue-600 sm:w-4 sm:h-4" />
         </div>
       </div>
       
       {/* Resize Handle */}
       <div
-        className="resize-handle absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-0 hover:opacity-100 transition-opacity duration-200"
+        className="resize-handle absolute bottom-0 right-0 w-5 h-5 sm:w-4 sm:h-4 cursor-se-resize opacity-0 hover:opacity-100 transition-opacity duration-200 touch-manipulation"
         onMouseDown={handleResizeStart}
       >
-        <div className="w-full h-full bg-blue-600 rounded-full"></div>
+        <div className="w-3 h-3 sm:w-full sm:h-full bg-blue-600 rounded-full absolute bottom-1 right-1 sm:bottom-0 sm:right-0"></div>
       </div>
       
       {/* Rotation Handle */}
       <div
-        className="rotate-handle absolute top-0 right-0 w-4 h-4 cursor-grab opacity-0 hover:opacity-100 transition-opacity duration-200"
+        className="rotate-handle absolute top-0 right-0 w-5 h-5 sm:w-4 sm:h-4 cursor-grab opacity-0 hover:opacity-100 transition-opacity duration-200 touch-manipulation"
         onMouseDown={handleRotateStart}
       >
-        <div className="w-full h-full bg-green-600 rounded-full flex items-center justify-center">
-          <RotateCw size={12} className="text-white" />
+        <div className="w-3 h-3 sm:w-full sm:h-full bg-green-600 rounded-full flex items-center justify-center absolute top-1 right-1 sm:top-0 sm:right-0">
+          <RotateCw size={8} className="text-white sm:w-3 sm:h-3" />
         </div>
       </div>
       
       {/* Remove Button */}
       <button
         onClick={onRemove}
-        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-red-600"
+        className="absolute -top-2 -right-2 w-6 h-6 sm:w-5 sm:h-5 bg-red-500 text-white rounded-full opacity-0 hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-red-600 touch-manipulation"
       >
-        <X size={14} />
+        <X size={12} className="sm:w-3 sm:h-3" />
       </button>
       
       {/* Position Indicator */}
-      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+      <div className="absolute -top-6 sm:-top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
         {Math.round(position.x)}, {Math.round(position.y)}
       </div>
     </div>

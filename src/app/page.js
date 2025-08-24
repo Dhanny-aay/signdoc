@@ -1,102 +1,247 @@
-import Image from "next/image";
+import Link from "next/link";
+import NavBar from "@/components/NavBar";
+import { FileText, Shield, Zap, Users, CheckCircle, ArrowRight, Download, Edit3, PenTool, Type, MousePointer, Maximize2, Undo2, Redo2 } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen flex flex-col bg-white">
+      <NavBar />
+      
+      {/* Hero Section */}
+      <main className="flex-1">
+        <section className="px-6 md:px-8 lg:px-14 w-full py-20">
+          <div className="text-center">
+            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 mb-6">
+              Full-Canvas Document Signing
+            </h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-10">
+              Experience signdoc 4.0 with a revolutionary toolbar-driven interface. Maximize your workspace with full-canvas PDF viewing and smooth, responsive signature placement.
+            </p>
+            <div className="flex items-center justify-center gap-4 flex-wrap">
+              <Link
+                href="/login"
+                className="px-8 py-4 rounded-xl bg-blue-600 text-white font-semibold text-lg hover:bg-blue-700 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+              >
+                Start Signing Free
+                <ArrowRight className="inline ml-2" size={20} />
+              </Link>
+              <Link
+                href="/dashboard"
+                className="px-8 py-4 rounded-xl border-2 border-gray-300 text-gray-700 font-semibold text-lg hover:border-gray-400 hover:bg-gray-50 transition-all duration-200"
+              >
+                View Dashboard
+              </Link>
+            </div>
+          </div>
+        </section>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+        {/* Features Section */}
+        <section className="px-6 md:px-8 lg:px-14 w-full py-20 bg-gray-50">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Revolutionary Toolbar-Driven Interface
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Built for maximum workspace efficiency with top-of-page controls and full-canvas document viewing.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                <Maximize2 className="text-blue-600" size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Full-Canvas Workspace</h3>
+              <p className="text-gray-600">
+                Maximize document viewing with a top toolbar design that gives you the entire canvas for PDF viewing and signature placement.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                <PenTool className="text-blue-600" size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Perfect Freehand Drawing</h3>
+              <p className="text-gray-600">
+                Create natural, smooth signatures with our advanced drawing engine. Every stroke is captured with precision.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                <Type className="text-blue-600" size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Premium Typed Signatures</h3>
+              <p className="text-gray-600">
+                Choose from 8 beautiful Google Fonts with customizable size and color. Perfect for professional documents.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                <MousePointer className="text-blue-600" size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Smooth Drag & Drop</h3>
+              <p className="text-gray-600">
+                Position signatures with pixel-perfect precision using requestAnimationFrame-based transforms for buttery-smooth interactions.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                <FileText className="text-blue-600" size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Full PDF Rendering</h3>
+              <p className="text-gray-600">
+                Complete PDF viewing with React PDF, zoom controls, page navigation, and seamless signature overlay support.
+              </p>
+            </div>
+
+            <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all duration-300">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                <Undo2 className="text-blue-600" size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Undo/Redo System</h3>
+              <p className="text-gray-600">
+                Full history management with undo/redo capabilities. Never lose your work with comprehensive action tracking.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* How It Works Section */}
+        <section className="px-6 md:px-8 lg:px-14 w-full py-20">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              How Full-Canvas Signing Works
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Experience the most intuitive document signing workflow ever created
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+                1
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Upload PDF</h3>
+              <p className="text-gray-600">
+                Drag and drop your PDF document. Our system securely stores it on Cloudinary for instant access.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+                2
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Create Signature</h3>
+              <p className="text-gray-600">
+                Use the top toolbar to select drawing or typing tools. Create signatures in a floating panel that doesn't block your view.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+                3
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Place & Position</h3>
+              <p className="text-gray-600">
+                Drag your signature anywhere on the full-canvas PDF. Resize, rotate, and adjust with smooth, responsive controls.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+                4
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Save & Download</h3>
+              <p className="text-gray-600">
+                Save your signed document with embedded signatures and download the final PDF with perfect positioning preserved.
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Technical Features */}
+        <section className="px-6 md:px-8 lg:px-14 w-full py-20 bg-gray-50">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+              Built with Modern Technology
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Cutting-edge tools and libraries powering the future of document signing
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-xl border border-gray-200 text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-blue-600 font-bold text-lg">PF</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Perfect Freehand</h3>
+              <p className="text-sm text-gray-600">Advanced stroke rendering for natural signatures</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-blue-600 font-bold text-lg">PDF</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">React PDF</h3>
+              <p className="text-sm text-gray-600">Full document rendering with zoom & navigation</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-blue-600 font-bold text-lg">RAF</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Smooth Transforms</h3>
+              <p className="text-sm text-gray-600">RequestAnimationFrame for fluid interactions</p>
+            </div>
+
+            <div className="bg-white p-6 rounded-xl border border-gray-200 text-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <span className="text-blue-600 font-bold text-lg">SB</span>
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">Supabase</h3>
+              <p className="text-sm text-gray-600">Enterprise-grade authentication and database</p>
+            </div>
+          </div>
+        </section>
+
+        {/* CTA Section */}
+        <section className="px-6 md:px-8 lg:px-14 w-full mx-auto py-20 text-center">
+          <div className="bg-blue-600 rounded-3xl p-12 text-white">
+            <h2 className="text-4xl font-bold mb-4">
+              Ready to Experience Full-Canvas Signing?
+            </h2>
+            <p className="text-xl mb-8 opacity-90">
+              Join the future of document signing with toolbar-driven controls and maximum workspace efficiency.
+            </p>
+            <Link
+              href="/login"
+              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 font-semibold text-lg rounded-xl hover:bg-gray-100 transition-all duration-200 shadow-lg"
+            >
+              Start Your Free Trial
+              <ArrowRight className="ml-2" size={20} />
+            </Link>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="border-t border-gray-200 py-12 text-center bg-white">
+        <div className="px-6 md:px-8 lg:px-14 w-full">
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <CheckCircle className="text-blue-600" size={20} />
+            <span className="text-lg font-semibold text-gray-900">signdoc 4.0</span>
+          </div>
+          <p className="text-gray-600 mb-4">
+            Full-canvas document signing with toolbar-driven interface.
+          </p>
+          <div className="text-sm text-gray-500">
+            © {new Date().getFullYear()} signdoc. Built with Next.js, Perfect Freehand, and Supabase.
+          </div>
+        </div>
       </footer>
     </div>
   );

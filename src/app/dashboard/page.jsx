@@ -85,68 +85,68 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <NavBar />
-      <main className="flex-1 max-w-7xl mx-auto px-6 py-10">
+      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
         {/* Header Section */}
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Document Dashboard</h1>
-          <p className="text-lg text-gray-600">Manage and track all your documents in one place</p>
+        <div className="mb-6 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">Document Dashboard</h1>
+          <p className="text-base sm:text-lg text-gray-600">Manage and track all your documents in one place</p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Documents</p>
-                <p className="text-3xl font-bold text-gray-900">{docs.length}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Total Documents</p>
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">{docs.length}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <FileText className="text-blue-600" size={24} />
+              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <FileText className="text-blue-600" size={16} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Ready to Sign</p>
-                <p className="text-3xl font-bold text-blue-600">{getStatusCount("ready")}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Ready to Sign</p>
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-blue-600">{getStatusCount("ready")}</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Clock className="text-blue-600" size={24} />
+              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <Clock className="text-blue-600" size={16} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Signed</p>
-                <p className="text-3xl font-bold text-green-600">{getStatusCount("signed")}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Signed</p>
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-green-600">{getStatusCount("signed")}</p>
               </div>
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <CheckCircle className="text-green-600" size={24} />
+              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <CheckCircle className="text-green-600" size={16} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+          <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Archived</p>
-                <p className="text-3xl font-bold text-gray-600">{getStatusCount("archived")}</p>
+                <p className="text-xs sm:text-sm font-medium text-gray-600">Archived</p>
+                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-600">{getStatusCount("archived")}</p>
               </div>
-              <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
-                <Archive className="text-gray-600" size={24} />
+              <div className="w-8 h-8 sm:w-12 sm:h-12 bg-gray-100 rounded-lg sm:rounded-xl flex items-center justify-center">
+                <Archive className="text-gray-600" size={16} />
               </div>
             </div>
           </div>
         </div>
 
         {/* Actions Bar */}
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 mb-8">
+        <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-200 mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex-1 max-w-md">
+            <div className="w-full sm:flex-1 sm:max-w-md">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                 <input
@@ -154,13 +154,13 @@ export default function DashboardPage() {
                   placeholder="Search documents..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
                 />
               </div>
             </div>
             <Link
               href="/upload"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
             >
               <Plus size={20} />
               Upload New Document
@@ -169,19 +169,19 @@ export default function DashboardPage() {
         </div>
 
         {/* Documents List */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-xl font-semibold text-gray-900">Your Documents</h2>
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Your Documents</h2>
           </div>
           
           <div className="divide-y divide-gray-200">
             {filteredDocs.length === 0 ? (
-              <div className="px-6 py-12 text-center">
-                <FileText className="mx-auto text-gray-400 mb-4" size={48} />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">
+              <div className="px-4 sm:px-6 py-8 sm:py-12 text-center">
+                <FileText className="mx-auto text-gray-400 mb-4" size={40} />
+                <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2">
                   {searchTerm ? "No documents found" : "No documents yet"}
                 </h3>
-                <p className="text-gray-600 mb-6">
+                <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
                   {searchTerm 
                     ? "Try adjusting your search terms" 
                     : "Upload your first PDF to get started with document signing"
@@ -190,7 +190,7 @@ export default function DashboardPage() {
                 {!searchTerm && (
                   <Link
                     href="/upload"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+                    className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors text-sm sm:text-base"
                   >
                     <Plus size={20} />
                     Upload First Document
@@ -199,24 +199,24 @@ export default function DashboardPage() {
               </div>
             ) : (
               filteredDocs.map((doc) => (
-                <div key={doc.id} className="px-6 py-6 hover:bg-gray-50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4 flex-1 min-w-0">
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <FileText className="text-blue-600" size={24} />
+                <div key={doc.id} className="px-4 sm:px-6 py-4 sm:py-6 hover:bg-gray-50 transition-colors">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
+                    <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+                        <FileText className="text-blue-600" size={20} />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">
+                        <h3 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
                           {doc.fileName}
                         </h3>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-1 text-xs sm:text-sm text-gray-500">
                           <div className="flex items-center gap-1">
-                            <Calendar size={16} />
+                            <Calendar size={14} />
                             {doc.createdAt ? new Date(doc.createdAt).toLocaleDateString() : "Unknown date"}
                           </div>
                           {doc.status === "signed" && (
                             <div className="flex items-center gap-1">
-                              <Download size={16} />
+                              <Download size={14} />
                               <span>Ready to download</span>
                             </div>
                           )}
@@ -224,7 +224,7 @@ export default function DashboardPage() {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-4 ml-6">
+                    <div className="flex items-center gap-3 sm:gap-4 sm:ml-6">
                       {getStatusBadge(doc.status)}
                       <Link
                         href={`/sign/${doc.id}`}

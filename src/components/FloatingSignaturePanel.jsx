@@ -61,20 +61,21 @@ export default function FloatingSignaturePanel({
 
   return (
     <div
-      className={`fixed z-50 bg-white rounded-2xl border border-gray-200 shadow-xl ${className}`}
+      className={`fixed z-50 bg-white rounded-xl sm:rounded-2xl border border-gray-200 shadow-xl ${className}`}
       style={{
         left: position.x,
         top: position.y,
-        width: '380px',
-        maxHeight: '600px'
+        width: window.innerWidth < 640 ? '90vw' : '380px',
+        maxWidth: '90vw',
+        maxHeight: window.innerWidth < 640 ? '80vh' : '600px'
       }}
       onMouseDown={handleMouseDown}
     >
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50 rounded-t-2xl cursor-move">
+      <div className="flex items-center justify-between p-3 sm:p-4 border-b border-gray-200 bg-gray-50 rounded-t-xl sm:rounded-t-2xl cursor-move">
         <div className="flex items-center gap-2">
-          <Move size={16} className="text-gray-500" />
-          <span className="font-medium text-gray-700">
+          <Move size={14} className="text-gray-500" />
+          <span className="text-sm sm:text-base font-medium text-gray-700">
             {signatureMethod === 'drawn' ? 'Draw Signature' : 'Type Signature'}
           </span>
         </div>
@@ -82,20 +83,20 @@ export default function FloatingSignaturePanel({
           onClick={onClose}
           className="p-1 rounded-lg hover:bg-gray-200 transition-colors"
         >
-          <X size={18} className="text-gray-500" />
+          <X size={16} className="text-gray-500" />
         </button>
       </div>
 
       {/* Content */}
-      <div className="p-4 max-h-[500px] overflow-y-auto">
-  {signatureMethod === "drawn" && (
-    <SignatureCanvas onSignatureComplete={onSignatureComplete} />
-  )}
+      <div className="p-3 sm:p-4 max-h-[70vh] sm:max-h-[500px] overflow-y-auto">
+        {signatureMethod === "drawn" && (
+          <SignatureCanvas onSignatureComplete={onSignatureComplete} />
+        )}
 
-  {signatureMethod === "typed" && (
-    <TypedSignature onSignatureComplete={onSignatureComplete} />
-  )}
-</div>
+        {signatureMethod === "typed" && (
+          <TypedSignature onSignatureComplete={onSignatureComplete} />
+        )}
+      </div>
 
     </div>
   );

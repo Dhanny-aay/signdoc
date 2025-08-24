@@ -84,27 +84,27 @@ export default function TypedSignature({ onSignatureComplete, className = "" }) 
     <div className={`space-y-6 ${className}`}>
       {/* Font Selection */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-3">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
           Choose Font Style
         </label>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
           {SIGNATURE_FONTS.map((font) => (
             <button
               key={font.value}
               onClick={() => setSelectedFont(font.value)}
-              className={`p-4 border rounded-lg text-left transition-all duration-200 ${
+              className={`p-3 sm:p-4 border rounded-lg text-left transition-all duration-200 ${
                 selectedFont === font.value
                   ? "border-blue-500 bg-blue-50 ring-2 ring-blue-200"
                   : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
               }`}
             >
               <div 
-                className="text-lg font-medium mb-1"
+                className="text-base sm:text-lg font-medium mb-1"
                 style={{ fontFamily: font.value }}
               >
                 {font.name}
               </div>
-              <div className="text-sm text-gray-500">{font.category}</div>
+              <div className="text-xs sm:text-sm text-gray-500">{font.category}</div>
             </button>
           ))}
         </div>
@@ -112,7 +112,7 @@ export default function TypedSignature({ onSignatureComplete, className = "" }) 
 
       {/* Font Size */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
           Font Size: {fontSize}px
         </label>
         <input
@@ -127,15 +127,15 @@ export default function TypedSignature({ onSignatureComplete, className = "" }) 
 
       {/* Font Color */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
           Font Color
         </label>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {["#1f2937", "#dc2626", "#059669", "#7c3aed", "#ea580c", "#0891b2"].map((color) => (
             <button
               key={color}
               onClick={() => setFontColor(color)}
-              className={`w-8 h-8 rounded-full border-2 transition-all duration-200 ${
+              className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 transition-all duration-200 ${
                 fontColor === color ? "border-gray-400 scale-110" : "border-gray-200"
               }`}
               style={{ backgroundColor: color }}
@@ -146,7 +146,7 @@ export default function TypedSignature({ onSignatureComplete, className = "" }) 
 
       {/* Text Input */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
           Your Name
         </label>
         <input
@@ -154,21 +154,21 @@ export default function TypedSignature({ onSignatureComplete, className = "" }) 
           value={typedSignature}
           onChange={(e) => setTypedSignature(e.target.value)}
           placeholder="Enter your name"
-          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+          className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base sm:text-lg"
         />
       </div>
 
       {/* Preview */}
       {typedSignature && (
-        <div className="p-6 border border-gray-200 rounded-lg bg-gray-50">
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+        <div className="p-4 sm:p-6 border border-gray-200 rounded-lg bg-gray-50">
+          <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 sm:mb-3">
             Preview
           </label>
           <div 
-            className="text-center p-4 bg-white rounded border"
+            className="text-center p-3 sm:p-4 bg-white rounded border overflow-hidden"
             style={{ 
               fontFamily: selectedFont, 
-              fontSize: `${fontSize}px`, 
+              fontSize: `${Math.min(fontSize, window.innerWidth < 640 ? 32 : fontSize)}px`, 
               color: fontColor 
             }}
           >
@@ -181,9 +181,9 @@ export default function TypedSignature({ onSignatureComplete, className = "" }) 
       <button
         onClick={generateTypedSignature}
         disabled={!typedSignature.trim()}
-        className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+        className="w-full inline-flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white font-semibold rounded-lg sm:rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
       >
-        <Type size={20} />
+        <Type size={16} />
         Generate Signature
       </button>
     </div>

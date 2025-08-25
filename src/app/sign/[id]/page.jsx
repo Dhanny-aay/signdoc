@@ -294,32 +294,34 @@ export default function SignDocumentPage() {
       {/* Main Content */}
       <main className="flex-1 flex flex-col">
         {/* Document Header */}
-        <div className="px-6 py-4 bg-white border-b border-gray-200">
-          <div className="flex items-center justify-between">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 bg-white border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{docData.fileName}</h1>
-              <p className="text-gray-600">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 truncate">{docData.fileName}</h1>
+              <p className="text-sm sm:text-base text-gray-600">
                 {numPages ? `${numPages} pages` : 'Loading...'} • 
                 {signatures.length} signature{signatures.length !== 1 ? 's' : ''}
               </p>
             </div>
             
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-2 xs:gap-3 w-full sm:w-auto">
               <button
                 onClick={() => setShowSignaturePanel(true)}
-                className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors text-sm sm:text-base"
               >
-                <Plus size={20} className="inline mr-2" />
-                Add Signature
+                <Plus size={16} className="sm:w-5 sm:h-5" />
+                <span className="hidden xs:inline">Add Signature</span>
+                <span className="xs:hidden">Add</span>
               </button>
               
               <button
                 onClick={handleSaveDocument}
                 disabled={signatures.length === 0}
-                className="px-6 py-3 bg-green-600 text-white font-semibold rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+                className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-green-600 text-white font-semibold rounded-lg sm:rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md text-sm sm:text-base"
               >
-                <CheckCircle size={20} className="inline mr-2" />
-                Save Document
+                <CheckCircle size={16} className="sm:w-5 sm:h-5" />
+                <span className="hidden sm:inline">Save Document</span>
+                <span className="sm:hidden">Save</span>
               </button>
             </div>
           </div>
@@ -327,7 +329,7 @@ export default function SignDocumentPage() {
 
         {/* PDF Viewer */}
         <div className="flex-1 overflow-auto bg-gray-100">
-          <div className="p-6 flex justify-center">
+          <div className="p-2 sm:p-4 lg:p-6 flex justify-center">
             <PdfLibViewer
               url={docData.url}
               signatures={signatures}
@@ -337,6 +339,25 @@ export default function SignDocumentPage() {
               className="max-w-4xl"
             />
           </div>
+          
+          {/* Render draggable signatures */}
+          {signatures.map((signature) => (
+            <EnhancedDraggableSignature
+              key={signature.id}
+              signatureData={signature.data}
+              position={signature.position}
+              onPositionChange={(newPosition) => handleSignaturePositionChange(signature.id, newPosition)}
+              onUpdate={(updateFn) => {
+                const currentSig = signatures.find(s => s.id === signature.id);
+                if (currentSig) {
+                  const updated = updateFn(currentSig);
+                  handleSignatureUpdate(signature.id, updated.position);
+                }
+              }}
+              onRemove={() => handleSignatureRemove(signature.id)}
+              className="z-30"
+            />
+          ))}
         </div>
       </main>
 

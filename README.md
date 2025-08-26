@@ -53,7 +53,7 @@ A revolutionary document signing application built with Next.js, featuring a ful
 - **Database**: Supabase PostgreSQL
 - **File Storage**: Cloudinary
 - **Signature Drawing**: Perfect Freehand
-- **PDF Rendering**: React PDF
+- **PDF Rendering**: @react-pdf-viewer/core + pdf-lib
 - **Performance**: RequestAnimationFrame for smooth transforms
 - **Icons**: Lucide React
 - **Notifications**: Sonner

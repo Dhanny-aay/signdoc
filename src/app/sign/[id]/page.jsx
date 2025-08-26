@@ -17,7 +17,8 @@ import {
   CheckCircle,
   Plus
 } from "lucide-react";
-import PdfLibViewer from "@/lib/PdfLibViewer ";
+import ReactPdfViewer from "@/lib/ReactPdfViewer";
+import SignatureOverlay from "@/components/SignatureOverlay";
 // import SafePdfLibViewer from "@/lib/PdfLibViewer ";
 
 export default function SignDocumentPage() {
@@ -33,6 +34,7 @@ export default function SignDocumentPage() {
   const [pdfScale, setPdfScale] = useState(1.0);
   const [showSignaturePanel, setShowSignaturePanel] = useState(false);
   const [pendingSignaturePosition, setPendingSignaturePosition] = useState(null);
+  const [pdfPages, setPdfPages] = useState([]);
   
   // History for undo/redo
   const [history, setHistory] = useState([]);
@@ -148,10 +150,14 @@ export default function SignDocumentPage() {
     toast.success("Signature added successfully!");
   }, [signatures, addToHistory, pendingSignaturePosition]);
 
-  const handleSignaturePositionChange = useCallback((signatureId, newPosition) => {
+  const handleSignaturePositionChange = useCallback((signatureId, newPosition, newPageNumber) => {
     const updatedSignatures = signatures.map(sig => 
       sig.id === signatureId 
-        ? { ...sig, position: { ...sig.position, ...newPosition } }
+        ? { 
+            ...sig, 
+            position: { ...sig.position, ...newPosition },
+            pageNumber: newPageNumber || sig.pageNumber
+          }
         : sig
     );
     setSignatures(updatedSignatures);
@@ -165,7 +171,8 @@ export default function SignDocumentPage() {
         : sig
     );
     setSignatures(updatedSignatures);
-  }, [signatures]);
+    addToHistory(updatedSignatures);
+  }, [signatures, addToHistory]);
 
   const handleSignatureRemove = useCallback((signatureId) => {
     const newSignatures = signatures.filter(sig => sig.id !== signatureId);
@@ -257,10 +264,17 @@ export default function SignDocumentPage() {
     setPendingSignaturePosition(null);
   }, []);
 
-  const handleDocumentLoadSuccess = useCallback(({ numPages }) => {
+  const handleDocumentLoadSuccess = useCallback(({ numPages, pages, scale: newScale }) => {
     setNumPages(numPages);
+    setPdfPages(pages || []);
+    
+    // Update scale if provided by the viewer
+    if (newScale && newScale !== pdfScale) {
+      setPdfScale(newScale);
+    }
+    
     toast.success(`Document loaded with ${numPages} pages`);
-  }, []);
+  }, [pdfScale]);
 
   if (loadingDoc) {
     return (
@@ -327,37 +341,30 @@ export default function SignDocumentPage() {
           </div>
         </div>
 
-        {/* PDF Viewer */}
-        <div className="flex-1 overflow-auto bg-gray-100">
+        {/* PDF Viewer with Signature Overlay */}
+        <div className="flex-1 overflow-auto bg-gray-100 relative">
           <div className="p-2 sm:p-4 lg:p-6 flex justify-center">
-            <PdfLibViewer
-              url={docData.url}
-              signatures={signatures}
-              scale={pdfScale}
-              onDocumentLoad={handleDocumentLoadSuccess}
-              onPageClick={handlePageClick}
-              className="max-w-4xl"
-            />
+            <div className="relative max-w-4xl">
+                             <ReactPdfViewer
+                 url={docData.url}
+                 scale={pdfScale}
+                 onDocumentLoad={handleDocumentLoadSuccess}
+                 onPageClick={handlePageClick}
+                 className="w-full"
+               />
+              
+              {/* Signature Overlay */}
+              <SignatureOverlay
+                signatures={signatures}
+                pages={pdfPages}
+                scale={pdfScale}
+                onSignatureMove={handleSignaturePositionChange}
+                onSignatureUpdate={handleSignatureUpdate}
+                onSignatureRemove={handleSignatureRemove}
+                className="absolute inset-0"
+              />
+            </div>
           </div>
-          
-          {/* Render draggable signatures */}
-          {signatures.map((signature) => (
-            <EnhancedDraggableSignature
-              key={signature.id}
-              signatureData={signature.data}
-              position={signature.position}
-              onPositionChange={(newPosition) => handleSignaturePositionChange(signature.id, newPosition)}
-              onUpdate={(updateFn) => {
-                const currentSig = signatures.find(s => s.id === signature.id);
-                if (currentSig) {
-                  const updated = updateFn(currentSig);
-                  handleSignatureUpdate(signature.id, updated.position);
-                }
-              }}
-              onRemove={() => handleSignatureRemove(signature.id)}
-              className="z-30"
-            />
-          ))}
         </div>
       </main>
 

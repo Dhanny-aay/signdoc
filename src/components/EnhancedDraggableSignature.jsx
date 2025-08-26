@@ -9,6 +9,8 @@ export default function EnhancedDraggableSignature({
   onPositionChange, 
   onRemove,
   onUpdate,
+  pageBoundaries = null,
+  onPageChange = null,
   className = "" 
 }) {
   const [isDragging, setIsDragging] = useState(false);
@@ -73,15 +75,35 @@ export default function EnhancedDraggableSignature({
       const newX = e.clientX - dragOffset.x;
       const newY = e.clientY - dragOffset.y;
       
-      // Keep within reasonable bounds
-      const currentSize = position.size || { width: 200, height: 80 };
-      const maxX = window.innerWidth - currentSize.width;
-      const maxY = window.innerHeight - currentSize.height;
-      
-      const boundedPosition = {
-        x: Math.max(0, Math.min(maxX, newX)),
-        y: Math.max(0, Math.min(maxY, newY))
-      };
+      // Use page boundaries if available, otherwise fall back to window bounds
+      let boundedPosition;
+      if (pageBoundaries) {
+        const currentSize = position.size || { width: 200, height: 80 };
+        boundedPosition = {
+          x: Math.max(0, Math.min(pageBoundaries.width - currentSize.width, newX)),
+          y: Math.max(0, Math.min(pageBoundaries.height - currentSize.height, newY))
+        };
+        
+        // Check if we're crossing page boundaries
+        if (newX < 0 || newY < 0 || 
+            newX + currentSize.width > pageBoundaries.width || 
+            newY + currentSize.height > pageBoundaries.height) {
+          // Signal potential page change
+          if (onPageChange) {
+            onPageChange();
+          }
+        }
+      } else {
+        // Fall back to window bounds
+        const currentSize = position.size || { width: 200, height: 80 };
+        const maxX = window.innerWidth - currentSize.width;
+        const maxY = window.innerHeight - currentSize.height;
+        
+        boundedPosition = {
+          x: Math.max(0, Math.min(maxX, newX)),
+          y: Math.max(0, Math.min(maxY, newY))
+        };
+      }
       
       smoothUpdatePosition(boundedPosition);
     }
@@ -152,17 +174,38 @@ export default function EnhancedDraggableSignature({
     const newX = touch.clientX - dragOffset.x;
     const newY = touch.clientY - dragOffset.y;
     
-    const currentSize = position.size || { width: 200, height: 80 };
-    const maxX = window.innerWidth - currentSize.width;
-    const maxY = window.innerHeight - currentSize.height;
-    
-    const boundedPosition = {
-      x: Math.max(0, Math.min(maxX, newX)),
-      y: Math.max(0, Math.min(maxY, newY))
-    };
+    // Use page boundaries if available, otherwise fall back to window bounds
+    let boundedPosition;
+    if (pageBoundaries) {
+      const currentSize = position.size || { width: 200, height: 80 };
+      boundedPosition = {
+        x: Math.max(0, Math.min(pageBoundaries.width - currentSize.width, newX)),
+        y: Math.max(0, Math.min(pageBoundaries.height - currentSize.height, newY))
+      };
+      
+      // Check if we're crossing page boundaries
+      if (newX < 0 || newY < 0 || 
+          newX + currentSize.width > pageBoundaries.width || 
+          newY + currentSize.height > pageBoundaries.height) {
+        // Signal potential page change
+        if (onPageChange) {
+          onPageChange();
+        }
+      }
+    } else {
+      // Fall back to window bounds
+      const currentSize = position.size || { width: 200, height: 80 };
+      const maxX = window.innerWidth - currentSize.width;
+      const maxY = window.innerHeight - currentSize.height;
+      
+      boundedPosition = {
+        x: Math.max(0, Math.min(maxX, newX)),
+        y: Math.max(0, Math.min(maxY, newY))
+      };
+    }
     
     smoothUpdatePosition(boundedPosition);
-  }, [isDragging, dragOffset, smoothUpdatePosition]);
+  }, [isDragging, dragOffset, smoothUpdatePosition, pageBoundaries, onPageChange]);
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false);

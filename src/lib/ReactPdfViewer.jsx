@@ -1,14 +1,9 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Viewer, Worker } from '@react-pdf-viewer/core';
-import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
-import { zoomPlugin } from '@react-pdf-viewer/zoom';
-import { pageNavigationPlugin } from '@react-pdf-viewer/page-navigation';
-import { Loader2, FileText } from 'lucide-react';
-import createCustomToolbarPlugin from '@/components/CustomToolbarPlugin';
+import * as pdfjsLib from 'pdfjs-dist';
+import { Loader2, FileText, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 
-// Import styles
-import '@react-pdf-viewer/core/lib/styles/index.css';
-import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+// Set up PDF.js worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
 
 const ReactPdfViewer = ({ 
   url, 
@@ -21,174 +16,140 @@ const ReactPdfViewer = ({
   const [error, setError] = useState(null);
   const [numPages, setNumPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentScale, setCurrentScale] = useState(scale);
+  const [pdfDocument, setPdfDocument] = useState(null);
   
-  const viewerRef = useRef(null);
+  const canvasRef = useRef(null);
   const containerRef = useRef(null);
 
-  console.log('url', url);
+  // Load PDF document
+  useEffect(() => {
+    if (!url) return;
 
-  // Create plugins
-  const defaultLayoutPluginInstance = defaultLayoutPlugin({
-    sidebarTabs: () => [], // Disable sidebar for full-canvas experience
-    toolbarPlugin: {
-      fullScreenPlugin: {
-        onEnterFullScreen: (zoom) => {
-          zoom(scale);
-          return Promise.resolve();
-        },
-        onExitFullScreen: (zoom) => {
-          zoom(scale);
-          return Promise.resolve();
-        },
-      },
-    },
-    // Handle document load through plugin configuration
-    onDocumentLoad: (e) => {
-      console.log('Document loaded:', e);
-      setLoading(false);
-      setNumPages(e.doc.numPages);
-      setCurrentPage(1);
-
-      // Apply initial zoom
-      if (zoomTo) {
-        zoomTo(scale);
-      }
-
-      // Update custom toolbar plugin
-      customToolbarPlugin.onDocumentLoad(e);
-
-      onDocumentLoad?.({
-        numPages: e.doc.numPages,
-        pages: Array.from({ length: e.doc.numPages }, (_, i) => ({
-          pageNumber: i + 1,
-          width: 595,
-          height: 842,
-          scaledWidth: 595 * scale,
-          scaledHeight: 842 * scale,
-        })),
-        scale,
-      });
-    },
-  });
-
-  const zoomPluginInstance = zoomPlugin({
-    // Handle zoom changes through plugin configuration
-    onZoom: (e) => {
-      console.log('Zoom changed:', e);
-      const newScale = e.scale;
-      
-      // Update custom toolbar plugin
-      customToolbarPlugin.onZoom(e);
-      
-      if (onDocumentLoad && numPages > 0) {
-        // Update pages with new scale
-        const updatedPages = Array.from({ length: numPages }, (_, i) => ({
-          pageNumber: i + 1,
-          width: 595,
-          height: 842,
-          scaledWidth: 595 * newScale,
-          scaledHeight: 842 * newScale
-        }));
+    const loadDocument = async () => {
+      try {
+        setLoading(true);
+        setError(null);
         
-        onDocumentLoad({ 
-          numPages, 
-          pages: updatedPages,
-          scale: newScale
-        });
-      }
-    },
-  });
-
-  const pageNavigationPluginInstance = pageNavigationPlugin({
-    // Handle page changes through plugin configuration
-    onPageChange: (e) => {
-      console.log('Page changed:', e);
-      setCurrentPage(e.currentPage);
-      customToolbarPlugin.onPageChange(e);
-    },
-  });
-  
-  // Custom toolbar plugin
-  const customToolbarPlugin = createCustomToolbarPlugin(
-    (newScale) => {
-      console.log('Custom toolbar zoom change:', newScale);
-      if (onDocumentLoad && numPages > 0) {
-        const updatedPages = Array.from({ length: numPages }, (_, i) => ({
-          pageNumber: i + 1,
-          width: 595, // Default A4 width
-          height: 842, // Default A4 height
-          scaledWidth: 595 * newScale,
-          scaledHeight: 842 * newScale
-        }));
+        const loadingTask = pdfjsLib.getDocument(url);
+        const pdf = await loadingTask.promise;
         
-        onDocumentLoad({ 
-          numPages, 
-          pages: updatedPages,
-          scale: newScale
+        setPdfDocument(pdf);
+        setNumPages(pdf.numPages);
+        setCurrentPage(1);
+        
+        // Call parent callback
+        onDocumentLoad?.({
+          numPages: pdf.numPages,
+          pages: Array.from({ length: pdf.numPages }, (_, i) => ({
+            pageNumber: i + 1,
+            width: 595,
+            height: 842,
+            scaledWidth: 595 * currentScale,
+            scaledHeight: 842 * currentScale,
+          })),
+          scale: currentScale,
         });
+        
+        setLoading(false);
+      } catch (err) {
+        console.error('Error loading PDF:', err);
+        setError(err.message || 'Failed to load PDF');
+        setLoading(false);
       }
-    },
-    (newPage) => {
-      console.log('Custom toolbar page change:', newPage);
-      setCurrentPage(newPage);
-    }
-  );
+    };
 
-  // Extract helpers
-  const { zoomTo } = zoomPluginInstance;
-  const { jumpToPage } = pageNavigationPluginInstance;
+    loadDocument();
+  }, [url, onDocumentLoad, currentScale]);
 
-  // Custom renderPage function to capture clicks for signature placement
-  const renderPage = useCallback((props) => {
-    const { canvasLayer, annotationLayer, textLayer, pageIndex } = props;
+  // Render current page
+  useEffect(() => {
+    if (!pdfDocument || !canvasRef.current) return;
+
+    const renderPage = async () => {
+      try {
+        const page = await pdfDocument.getPage(currentPage);
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+
+        // Calculate viewport
+        const viewport = page.getViewport({ scale: currentScale });
+        
+        // Set canvas dimensions
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        
+        // Render page
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport,
+        };
+
+        await page.render(renderContext).promise;
+      } catch (err) {
+        console.error('Error rendering page:', err);
+        setError('Failed to render page');
+      }
+    };
+
+    renderPage();
+  }, [pdfDocument, currentPage, currentScale]);
+
+  // Handle zoom changes
+  const handleZoomChange = useCallback((newScale) => {
+    console.log('Zoom changed:', newScale);
+    setCurrentScale(newScale);
     
-    return (
-      <div 
-        key={`page-${pageIndex}`}
-        className="relative"
-        onClick={(e) => {
-          if (!onPageClick) return;
-          
-          const rect = e.currentTarget.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          
-          const currentPageInfo = {
-            pageNumber: pageIndex + 1,
-            x,
-            y
-          };
-          
-          onPageClick(currentPageInfo);
-        }}
-      >
-        {canvasLayer}
-        {annotationLayer}
-        {textLayer}
-      </div>
-    );
-  }, [onPageClick]);
-
-  // Apply zoom when scale prop changes
-  useEffect(() => {
-    if (zoomTo && !loading) {
-      zoomTo(scale);
+    if (onDocumentLoad && numPages > 0) {
+      const updatedPages = Array.from({ length: numPages }, (_, i) => ({
+        pageNumber: i + 1,
+        width: 595,
+        height: 842,
+        scaledWidth: 595 * newScale,
+        scaledHeight: 842 * newScale,
+      }));
+      onDocumentLoad({ numPages, pages: updatedPages, scale: newScale });
     }
-  }, [scale, zoomTo, loading]);
+  }, [numPages, onDocumentLoad]);
 
-  // Jump to page when currentPage updates
-  useEffect(() => {
-    if (jumpToPage && currentPage > 0 && currentPage <= numPages) {
-      jumpToPage(currentPage - 1); // Viewer uses 0-based indexing
+  // Handle page navigation
+  const nextPage = useCallback(() => {
+    if (currentPage < numPages) {
+      setCurrentPage(currentPage + 1);
     }
-  }, [currentPage, numPages, jumpToPage]);
+  }, [currentPage, numPages]);
+
+  const prevPage = useCallback(() => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  }, [currentPage]);
+
+  // Handle canvas click for signature placement
+  const handleCanvasClick = useCallback((e) => {
+    if (!onPageClick) return;
+    
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    
+    onPageClick({
+      pageNumber: currentPage,
+      x: x,
+      y: y,
+    });
+  }, [onPageClick, currentPage]);
+
+  // Apply scale when scale prop changes
+  useEffect(() => {
+    setCurrentScale(scale);
+  }, [scale]);
 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
         <Loader2 className="animate-spin mb-4" size={32} />
         <p className="text-gray-600">Loading PDF document...</p>
-        <p className="text-sm text-gray-500 mt-2">This may take a moment for large files</p>
       </div>
     );
   }
@@ -211,34 +172,71 @@ const ReactPdfViewer = ({
 
   return (
     <div className={`w-full ${className}`}>
-      <div 
-        ref={containerRef}
-        className="relative w-full"
-        style={{ minHeight: '600px' }}
-      >
-        <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-          <div
-            ref={viewerRef}
-            className="w-full h-full"
-            style={{ height: '100%', minHeight: '600px' }}
-          >
-            <Viewer
-              fileUrl={url}
-              plugins={[
-                defaultLayoutPluginInstance,
-                zoomPluginInstance,
-                pageNavigationPluginInstance,
-                customToolbarPlugin,
-              ]}
-              renderPage={renderPage}
-              defaultScale={scale}
-              theme={{ theme: 'auto' }}
-            />
+      <div ref={containerRef} className="relative w-full">
+        {/* PDF Controls */}
+        <div className="flex items-center justify-between bg-white border-b border-gray-200 px-4 py-2">
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={prevPage}
+              disabled={currentPage <= 1}
+              className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            <span className="text-sm text-gray-600">
+              Page {currentPage} of {numPages}
+            </span>
+            <button
+              onClick={nextPage}
+              disabled={currentPage >= numPages}
+              className="p-2 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronRight size={20} />
+            </button>
           </div>
-        </Worker>
+          
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => handleZoomChange(Math.max(0.5, currentScale - 0.25))}
+              className="p-2 rounded hover:bg-gray-100"
+            >
+              <ZoomOut size={20} />
+            </button>
+            <span className="text-sm text-gray-600 min-w-[60px] text-center">
+              {Math.round(currentScale * 100)}%
+            </span>
+            <button
+              onClick={() => handleZoomChange(Math.min(3.0, currentScale + 0.25))}
+              className="p-2 rounded hover:bg-gray-100"
+            >
+              <ZoomIn size={20} />
+            </button>
+            <button
+              onClick={() => handleZoomChange(1.0)}
+              className="p-2 rounded hover:bg-gray-100"
+            >
+              <RotateCcw size={20} />
+            </button>
+          </div>
+        </div>
+
+        {/* PDF Canvas */}
+        <div className="flex justify-center bg-gray-100 p-4">
+          <canvas
+            ref={canvasRef}
+            onClick={handleCanvasClick}
+            className="border border-gray-300 shadow-lg cursor-crosshair"
+            style={{ 
+              maxWidth: '100%', 
+              height: 'auto',
+              cursor: onPageClick ? 'crosshair' : 'default'
+            }}
+          />
+        </div>
       </div>
     </div>
   );
 };
 
 export default ReactPdfViewer;
+

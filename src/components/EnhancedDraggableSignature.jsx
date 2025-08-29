@@ -9,19 +9,21 @@ export default function EnhancedDraggableSignature({
   onPositionChange, 
   onRemove,
   onUpdate,
+  pageBoundaries = null,
+  onPageChange = null,
   className = "" 
 }) {
   const [isDragging, setIsDragging] = useState(false);
   const [isResizing, setIsResizing] = useState(false);
   const [isRotating, setIsRotating] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [resizeOffset, setResizeOffset] = useState({ x: 0, y: 0 });
-  const [rotationOffset, setRotationOffset] = useState(0);
+  const [initialSize, setInitialSize] = useState({ width: 0, height: 0 });
+  const [initialRotation, setInitialRotation] = useState(0);
   
   const signatureRef = useRef(null);
   const animationFrameRef = useRef(null);
 
-  // Smooth position update using requestAnimationFrame
+  // Smooth updates using requestAnimationFrame for better performance
   const smoothUpdatePosition = useCallback((newPosition) => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -32,7 +34,6 @@ export default function EnhancedDraggableSignature({
     });
   }, [onPositionChange]);
 
-  // Smooth size update
   const smoothUpdateSize = useCallback((newSize) => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -40,6 +41,16 @@ export default function EnhancedDraggableSignature({
     
     animationFrameRef.current = requestAnimationFrame(() => {
       onUpdate(prev => ({ ...prev, size: newSize }));
+    });
+  }, [onUpdate]);
+
+  const smoothUpdateRotation = useCallback((newRotation) => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    
+    animationFrameRef.current = requestAnimationFrame(() => {
+      onUpdate(prev => ({ ...prev, rotation: newRotation }));
     });
   }, [onUpdate]);
 
@@ -52,6 +63,9 @@ export default function EnhancedDraggableSignature({
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     setDragOffset({ x, y });
+    
+    // Prevent text selection during drag
+    e.preventDefault();
   }, []);
 
   const handleMouseMove = useCallback((e) => {
@@ -61,21 +75,43 @@ export default function EnhancedDraggableSignature({
       const newX = e.clientX - dragOffset.x;
       const newY = e.clientY - dragOffset.y;
       
-      // Keep within viewport bounds
-      const maxX = window.innerWidth - 200;
-      const maxY = window.innerHeight - 100;
-      
-      const boundedPosition = {
-        x: Math.max(0, Math.min(maxX, newX)),
-        y: Math.max(0, Math.min(maxY, newY))
-      };
+      // Use page boundaries if available, otherwise fall back to window bounds
+      let boundedPosition;
+      if (pageBoundaries) {
+        const currentSize = position.size || { width: 200, height: 80 };
+        boundedPosition = {
+          x: Math.max(0, Math.min(pageBoundaries.width - currentSize.width, newX)),
+          y: Math.max(0, Math.min(pageBoundaries.height - currentSize.height, newY))
+        };
+        
+        // Check if we're crossing page boundaries
+        if (newX < 0 || newY < 0 || 
+            newX + currentSize.width > pageBoundaries.width || 
+            newY + currentSize.height > pageBoundaries.height) {
+          // Signal potential page change
+          if (onPageChange) {
+            onPageChange();
+          }
+        }
+      } else {
+        // Fall back to window bounds
+        const currentSize = position.size || { width: 200, height: 80 };
+        const maxX = window.innerWidth - currentSize.width;
+        const maxY = window.innerHeight - currentSize.height;
+        
+        boundedPosition = {
+          x: Math.max(0, Math.min(maxX, newX)),
+          y: Math.max(0, Math.min(maxY, newY))
+        };
+      }
       
       smoothUpdatePosition(boundedPosition);
     }
     
     if (isResizing) {
-      const newWidth = Math.max(100, Math.min(500, e.clientX - position.x));
-      const newHeight = Math.max(50, Math.min(300, e.clientY - position.y));
+      const rect = signatureRef.current.getBoundingClientRect();
+      const newWidth = Math.max(50, Math.min(600, e.clientX - rect.left));
+      const newHeight = Math.max(25, Math.min(400, e.clientY - rect.top));
       
       smoothUpdateSize({ width: newWidth, height: newHeight });
     }
@@ -86,9 +122,12 @@ export default function EnhancedDraggableSignature({
       const centerY = rect.top + rect.height / 2;
       
       const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-      const degrees = (angle * 180) / Math.PI;
+      let degrees = (angle * 180) / Math.PI;
       
-      onUpdate(prev => ({ ...prev, rotation: degrees }));
+      // Snap to 15-degree increments for easier alignment
+      degrees = Math.round(degrees / 15) * 15;
+      
+      smoothUpdateRotation(degrees);
     }
   }, [isDragging, isResizing, isRotating, dragOffset, position, smoothUpdatePosition, smoothUpdateSize, onUpdate]);
 
@@ -98,31 +137,28 @@ export default function EnhancedDraggableSignature({
     setIsRotating(false);
   }, []);
 
-  // Resize handlers
+  // Handle resize start
   const handleResizeStart = useCallback((e) => {
     e.stopPropagation();
     setIsResizing(true);
-    const rect = signatureRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.right;
-    const y = e.clientY - rect.bottom;
-    setResizeOffset({ x, y });
+    setInitialSize(position.size || { width: 200, height: 80 });
   }, []);
 
-  // Rotation handlers
+  // Handle rotation start
   const handleRotateStart = useCallback((e) => {
     e.stopPropagation();
     setIsRotating(true);
-    const rect = signatureRef.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const angle = Math.atan2(e.clientY - centerY, e.clientX - centerX);
-    setRotationOffset(angle);
+    setInitialRotation(position.rotation || 0);
   }, []);
 
   // Touch event handlers for mobile
   const handleTouchStart = useCallback((e) => {
     e.preventDefault();
     const touch = e.touches[0];
+    
+    // Check if touch is on a handle
+    if (e.target.closest('.resize-handle, .rotate-handle')) return;
+    
     const rect = signatureRef.current.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;
@@ -138,28 +174,72 @@ export default function EnhancedDraggableSignature({
     const newX = touch.clientX - dragOffset.x;
     const newY = touch.clientY - dragOffset.y;
     
-    const maxX = window.innerWidth - 200;
-    const maxY = window.innerHeight - 100;
-    
-    const boundedPosition = {
-      x: Math.max(0, Math.min(maxX, newX)),
-      y: Math.max(0, Math.min(maxY, newY))
-    };
+    // Use page boundaries if available, otherwise fall back to window bounds
+    let boundedPosition;
+    if (pageBoundaries) {
+      const currentSize = position.size || { width: 200, height: 80 };
+      boundedPosition = {
+        x: Math.max(0, Math.min(pageBoundaries.width - currentSize.width, newX)),
+        y: Math.max(0, Math.min(pageBoundaries.height - currentSize.height, newY))
+      };
+      
+      // Check if we're crossing page boundaries
+      if (newX < 0 || newY < 0 || 
+          newX + currentSize.width > pageBoundaries.width || 
+          newY + currentSize.height > pageBoundaries.height) {
+        // Signal potential page change
+        if (onPageChange) {
+          onPageChange();
+        }
+      }
+    } else {
+      // Fall back to window bounds
+      const currentSize = position.size || { width: 200, height: 80 };
+      const maxX = window.innerWidth - currentSize.width;
+      const maxY = window.innerHeight - currentSize.height;
+      
+      boundedPosition = {
+        x: Math.max(0, Math.min(maxX, newX)),
+        y: Math.max(0, Math.min(maxY, newY))
+      };
+    }
     
     smoothUpdatePosition(boundedPosition);
-  }, [isDragging, dragOffset, smoothUpdatePosition]);
+  }, [isDragging, dragOffset, smoothUpdatePosition, pageBoundaries, onPageChange]);
 
   const handleTouchEnd = useCallback(() => {
     setIsDragging(false);
+    setIsResizing(false);
+    setIsRotating(false);
+  }, []);
+
+  // Handle resize touch events
+  const handleResizeTouchStart = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsResizing(true);
+    setInitialSize(position.size || { width: 200, height: 80 });
+  }, []);
+
+  // Handle rotation touch events
+  const handleRotateTouchStart = useCallback((e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setIsRotating(true);
+    setInitialRotation(position.rotation || 0);
   }, []);
 
   useEffect(() => {
     if (isDragging || isResizing || isRotating) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleTouchEnd);
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleTouchEnd);
       };
     }
   }, [isDragging, isResizing, isRotating, handleMouseMove, handleMouseUp]);
@@ -175,67 +255,74 @@ export default function EnhancedDraggableSignature({
 
   if (!signatureData) return null;
 
+  const currentSize = position.size || { width: 200, height: 80 };
+  const currentRotation = position.rotation || 0;
+
   return (
     <div
       ref={signatureRef}
-      className={`absolute cursor-move select-none ${className}`}
+      className={`absolute cursor-move select-none touch-none ${className}`}
       style={{
         left: position.x,
         top: position.y,
-        width: position.size?.width || 200,
-        height: position.size?.height || 80,
-        transform: `rotate(${position.rotation || 0}deg)`,
+        width: currentSize.width,
+        height: currentSize.height,
+        transform: `rotate(${currentRotation}deg)`,
         transition: isDragging || isResizing || isRotating ? 'none' : 'transform 0.1s ease-out'
       }}
       onMouseDown={handleMouseDown}
       onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
     >
       {/* Signature Image */}
       <img
         src={signatureData}
         alt="Signature"
-        className="w-full h-full object-contain pointer-events-none"
+        className="w-full h-full object-contain pointer-events-none select-none"
         draggable={false}
       />
       
-      {/* Drag Handle */}
-      <div className="absolute inset-0 bg-transparent hover:bg-blue-50 hover:bg-opacity-20 transition-colors duration-200 rounded">
-        <div className="absolute top-2 left-2 opacity-0 hover:opacity-100 transition-opacity duration-200">
-          <Move size={16} className="text-blue-600" />
+      {/* Interactive Overlay */}
+      <div className="absolute inset-0 bg-transparent hover:bg-blue-50 hover:bg-opacity-30 transition-colors duration-200 rounded touch-manipulation border-2 border-transparent hover:border-blue-300">
+        <div className="absolute top-1 left-1 sm:top-2 sm:left-2 opacity-0 hover:opacity-100 transition-opacity duration-200">
+          <Move size={14} className="text-blue-600 sm:w-4 sm:h-4" />
         </div>
       </div>
       
-      {/* Resize Handle */}
+      {/* Blue Resize Handle */}
       <div
-        className="resize-handle absolute bottom-0 right-0 w-4 h-4 cursor-se-resize opacity-0 hover:opacity-100 transition-opacity duration-200"
+        className="resize-handle absolute bottom-0 right-0 w-6 h-6 sm:w-5 sm:h-5 cursor-se-resize opacity-0 hover:opacity-100 transition-opacity duration-200 touch-manipulation"
         onMouseDown={handleResizeStart}
+        onTouchStart={handleResizeTouchStart}
       >
-        <div className="w-full h-full bg-blue-600 rounded-full"></div>
+        <div className="w-4 h-4 sm:w-full sm:h-full bg-blue-600 rounded-full absolute bottom-1 right-1 sm:bottom-0 sm:right-0 shadow-md border-2 border-white"></div>
       </div>
       
-      {/* Rotation Handle */}
+      {/* Green Rotation Handle */}
       <div
-        className="rotate-handle absolute top-0 right-0 w-4 h-4 cursor-grab opacity-0 hover:opacity-100 transition-opacity duration-200"
+        className="rotate-handle absolute top-0 right-0 w-6 h-6 sm:w-5 sm:h-5 cursor-grab active:cursor-grabbing opacity-0 hover:opacity-100 transition-opacity duration-200 touch-manipulation"
         onMouseDown={handleRotateStart}
+        onTouchStart={handleRotateTouchStart}
       >
-        <div className="w-full h-full bg-green-600 rounded-full flex items-center justify-center">
-          <RotateCw size={12} className="text-white" />
+        <div className="w-4 h-4 sm:w-full sm:h-full bg-green-600 rounded-full flex items-center justify-center absolute top-1 right-1 sm:top-0 sm:right-0 shadow-md border-2 border-white">
+          <RotateCw size={10} className="text-white sm:w-3 sm:h-3" />
         </div>
       </div>
       
       {/* Remove Button */}
       <button
         onClick={onRemove}
-        className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 hover:opacity-100 transition-opacity duration-200 flex items-center justify-center hover:bg-red-600"
+        className="absolute -top-3 -right-3 w-7 h-7 sm:w-6 sm:h-6 bg-red-500 text-white rounded-full opacity-0 hover:opacity-100 transition-all duration-200 flex items-center justify-center hover:bg-red-600 touch-manipulation shadow-md border-2 border-white hover:scale-110"
       >
-        <X size={14} />
+        <X size={14} className="sm:w-4 sm:h-4" />
       </button>
       
       {/* Position Indicator */}
-      <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-        {Math.round(position.x)}, {Math.round(position.y)}
+      <div className="absolute -top-8 sm:-top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-3 py-1.5 rounded-lg opacity-0 hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none shadow-lg">
+        <div className="text-center">
+          <div>Position: {Math.round(position.x)}, {Math.round(position.y)}</div>
+          <div className="text-gray-300">Size: {Math.round(currentSize.width)}×{Math.round(currentSize.height)}</div>
+          {currentRotation !== 0 && <div className="text-gray-300">Rotation: {Math.round(currentRotation)}°</div>}
+        </div>
       </div>
     </div>
   );

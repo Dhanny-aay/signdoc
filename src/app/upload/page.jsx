@@ -128,19 +128,19 @@ export default function UploadPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <NavBar />
-      <main className="flex-1 max-w-4xl mx-auto px-6 py-12">
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold text-gray-900 mb-3">Upload Your Document</h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+      <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+        <div className="text-center mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-3">Upload Your Document</h1>
+          <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
             Upload a PDF document to get started with the signing process. Your files are securely stored on Cloudinary.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+        <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-200 p-4 sm:p-8">
           <form onSubmit={handleUpload} className="space-y-6">
             {/* Drag & Drop Area */}
             <div
-              className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-200 ${
+              className={`border-2 border-dashed rounded-xl sm:rounded-2xl p-6 sm:p-8 text-center transition-all duration-200 ${
                 dragActive
                   ? "border-blue-400 bg-blue-50"
                   : file
@@ -154,13 +154,13 @@ export default function UploadPage() {
             >
               {!file ? (
                 <div>
-                  <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <Upload className="text-gray-400" size={32} />
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <Upload className="text-gray-400" size={24} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                     Drop your PDF here
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="text-sm sm:text-base text-gray-600 mb-4">
                     or click to browse files
                   </p>
                   <input
@@ -172,29 +172,29 @@ export default function UploadPage() {
                   />
                   <label
                     htmlFor="file-upload"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-blue-600 text-white font-semibold rounded-lg sm:rounded-xl hover:bg-blue-700 transition-colors cursor-pointer text-sm sm:text-base"
                   >
-                    <FileText size={20} />
+                    <FileText size={18} />
                     Choose PDF File
                   </label>
                 </div>
               ) : (
                 <div>
-                  <div className="w-20 h-20 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle className="text-green-600" size={32} />
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-green-100 rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <CheckCircle className="text-green-600" size={24} />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">
                     File Selected
                   </h3>
-                  <p className="text-gray-600 mb-4 font-mono text-sm">
+                  <p className="text-gray-600 mb-4 font-mono text-xs sm:text-sm break-all">
                     {file.name}
                   </p>
                   <button
                     type="button"
                     onClick={removeFile}
-                    className="inline-flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                    className="inline-flex items-center gap-2 px-3 sm:px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors text-sm sm:text-base"
                   >
-                    <X size={20} />
+                    <X size={18} />
                     Remove File
                   </button>
                 </div>
@@ -204,7 +204,7 @@ export default function UploadPage() {
             {/* Upload Progress */}
             {submitting && (
               <div className="space-y-3">
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center justify-between text-xs sm:text-sm">
                   <span className="text-gray-600">Uploading to Cloudinary...</span>
                   <span className="font-medium text-gray-900">{uploadProgress}%</span>
                 </div>
@@ -221,25 +221,26 @@ export default function UploadPage() {
             <button
               type="submit"
               disabled={!file || submitting}
-              className="w-full inline-flex items-center justify-center gap-3 rounded-xl bg-blue-600 text-white py-4 font-semibold text-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
+              className="w-full inline-flex items-center justify-center gap-2 sm:gap-3 rounded-lg sm:rounded-xl bg-blue-600 text-white py-3 sm:py-4 font-semibold text-base sm:text-lg hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow-md"
             >
               {submitting ? (
                 <>
-                  <Loader2 className="animate-spin" size={20} />
+                  <Loader2 className="animate-spin" size={18} />
                   {uploadProgress === 100 ? "Processing..." : "Uploading..."}
                 </>
               ) : (
                 <>
-                  <Cloud size={20} />
-                  Upload and Continue to Signing
+                  <Cloud size={18} />
+                  <span className="hidden sm:inline">Upload and Continue to Signing</span>
+                  <span className="sm:hidden">Upload & Sign</span>
                 </>
               )}
             </button>
           </form>
 
           {/* Info Section */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-600">
+          <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-gray-200">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs sm:text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-blue-600 rounded-full"></div>
                 <span>Secure cloud storage</span>
